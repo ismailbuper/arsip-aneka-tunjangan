@@ -1173,6 +1173,65 @@
         printArea.style.display = 'none';
     }
 </script>
+<script type="module">
+  // 1. Import Firebase SDK (menggunakan CDN)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+  // 2. Masukkan konfigurasi Firebase milik Anda yang ada di layar tadi
+  const firebaseConfig = {
+    apiKey: "AIzaSyDiauoeWbolZvc6oH_BGZDT6QwvVG5tcPo",
+    authDomain: "tunjangan-guru-aceh.firebaseapp.com",
+    projectId: "tunjangan-guru-aceh",
+    storageBucket: "tunjangan-guru-aceh.firebasestorage.app",
+    messagingSenderId: "1050219017030",
+    appId: "1:1050219017030:web:ec6c06bff49e231aa42b47",
+    measurementId: "G-ZJQM52PZD9"
+  };
+
+  // 3. Inisialisasi Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // 4. Tangkap aksi saat tombol "Unggah & Simpan ke Arsip" diklik
+  const tombolSimpan = document.querySelector(".btn-primary"); // Menyesuaikan tombol warna biru di halaman Anda
+  
+  if (tombolSimpan) {
+    tombolSimpan.addEventListener("click", function(e) {
+      e.preventDefault(); // Mencegah halaman reload otomatis
+
+      // Ambil nilai dari dropdown formulir di halaman Anda
+      const selects = document.querySelectorAll("select");
+      const bulan = selects[0] ? selects[0].value : "";
+      const gelombang = selects[1] ? selects[1].value : "";
+      const golongan = selects[2] ? selects[2].value : "";
+      const jenisData = selects[3] ? selects[3].value : "";
+
+      // Validasi sederhana
+      if (!bulan || bulan.includes("Pilih")) {
+        alert("Silakan pilih bulan terlebih dahulu!");
+        return;
+      }
+
+      // Kirim data teks ke Realtime Database Firebase
+      const arsipRef = ref(db, 'arsip_tunjangan_guru');
+      const dataBaruRef = push(arsipRef);
+      
+      set(dataBaruRef, {
+        bulan: bulan,
+        gelombang: gelombang,
+        golongan: golongan,
+        jenisData: jenisData,
+        waktuUpload: new Date().toLocaleString()
+      })
+      .then(() => {
+        alert("Berhasil! Data arsip telah tersimpan secara online.");
+      })
+      .catch((error) => {
+        alert("Gagal menyimpan: " + error.message);
+      });
+    });
+  }
+</script>
 </body>
 </html>
