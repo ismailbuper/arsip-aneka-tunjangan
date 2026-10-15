@@ -272,7 +272,7 @@
                         <option value="Oktober">Oktober</option>
                         <option value="November">November</option>
                         <option value="Desember">Desember</option>
-                   </select>
+                    </select>
                 </div>
                 <div>
                     <label for="pilihGelombang">Pilih Gelombang:</label>
@@ -291,18 +291,18 @@
                         <option value="Gelombang 11">Gelombang 11</option>
                         <option value="Gelombang 12">Gelombang 12</option>
                         <option value="Gelombang Susulan">Gelombang Susulan</option>
-                        <option value="Gelombang Susulan I">Gelombang Susulan I</option>
                     </select>
-
                 </div>
                 <div>
                     <label for="pilihGolongan">Golongan Jenis:</label>
                     <select id="pilihGolongan" required>
                         <option value="">-- Pilih Golongan Jenis --</option>
-                        <option value="SMA, SMK, SLB, Pegawas">SMA, SMK, SLB, Pengawas</option>
+                        <option value="SMA">SMA</option>
+                        <option value="SMK">SMK</option>
+                        <option value="SLB">SLB</option>
+                        <option value="Pengawas">Pengawas</option>
                         <option value="Sekolah Rakyat">Sekolah Rakyat</option>
                         <option value="Sekolah Garuda">Sekolah Garuda</option>
-                        <option value="Sekolah Indonesia Jeddah">Sekolah Indonesia Jeddah</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
@@ -1173,89 +1173,6 @@
         printArea.style.display = 'none';
     }
 </script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDiauoeWbolZvc6oH_BGZDT6QwvVG5tcPo",
-    authDomain: "tunjangan-guru-aceh.firebaseapp.com",
-    projectId: "tunjangan-guru-aceh",
-    storageBucket: "tunjangan-guru-aceh.firebasestorage.app",
-    messagingSenderId: "1050219017030",
-    appId: "1:1050219017030:web:ec6c06bff49e231aa42b47",
-    measurementId: "G-ZJQM52PZD9"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-
-  const inputFile = document.querySelector('input[type="file"]');
-  const tombolSimpan = document.querySelector(".btn-primary");
-
-  let dataJsonParsed = null;
-
-  // Fungsi otomatis untuk membersihkan karakter terlarang pada kunci (key) objek
-  function bersihkanKeyFirebase(obj) {
-    if (Array.isArray(obj)) {
-      return obj.map(item => bersihkanKeyFirebase(item));
-    } else if (obj !== null && typeof obj === 'object') {
-      return Object.keys(obj).reduce((acc, key) => {
-        // Ganti karakter titik, $, #, [, ] dengan garis bawah _
-        const cleanKey = key.replace(/[.$#\[\]]/g, '_');
-        acc[cleanKey] = bersihkanKeyFirebase(obj[key]);
-        return acc;
-      }, {});
-    }
-    return obj;
-  }
-
-  // 1. Membaca file JSON dari komputer
-  if (inputFile) {
-    inputFile.addEventListener("change", function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        try {
-          const rawData = JSON.parse(event.target.result);
-          // Bersihkan datanya seketika setelah dibaca
-          dataJsonParsed = bersihkanKeyFirebase(rawData);
-          alert("File JSON berhasil dibaca & dibersihkan! Siap diunggah.");
-        } catch (error) {
-          alert("Format file bukan JSON yang valid: " + error.message);
-        }
-      };
-      reader.readAsText(file);
-    });
-  }
-
-  // 2. Mengirim data bersih ke Firebase saat tombol diklik
-  if (tombolSimpan) {
-    tombolSimpan.addEventListener("click", function(e) {
-      e.preventDefault();
-
-      if (!dataJsonParsed) {
-        alert("Silakan pilih file 'rekap_data.json' terlebih dahulu!");
-        return;
-      }
-
-      const arsipRef = ref(db, 'arsip_tunjangan_guru');
-
-      if (Array.isArray(dataJsonParsed)) {
-        dataJsonParsed.forEach((item) => {
-          const dataBaruRef = push(arsipRef);
-          set(dataBaruRef, item);
-        });
-      } else {
-        const dataBaruRef = push(arsipRef);
-        set(dataBaruRef, dataJsonParsed);
-      }
-
-      alert("Berhasil! Semua data lama telah tersimpan aman di database online.");
-    });
-  }
-</script>
 </body>
 </html>
