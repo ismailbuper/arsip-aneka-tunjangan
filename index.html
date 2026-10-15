@@ -5,24 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aneka Tunjangan Guru Aceh</title>
   
-  <!-- CSS Bootstrap & Styling Pendukung -->
+  <!-- Bootstrap CSS & FontAwesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Library SheetJS untuk Membaca File Excel (.xlsx / .xls) -->
+  <!-- Library SheetJS untuk Membaca File Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-</head>
-<body class="bg-light">
 
-  <div class="container mt-5">
-    <div class="card shadow p-4">
-      <h2 class="mb-3">Unggah & Arsipkan Berkas Excel Baru</h2>
-      <p class="text-muted">Pilih Periode Bulan, Gelombang, Golongan Jenis, dan Jenis Data untuk menyimpan data ke server.</p>
+  <style>
+    body { background-color: #f4f6f9; }
+    .navbar-custom {
+      background-color: #1e293b;
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-bottom: 25px;
+    }
+    .brand-title { color: #fff; font-weight: bold; font-size: 1.1rem; }
+    .brand-sub { color: #facc15; font-size: 0.75rem; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+
+  <div class="container py-4">
+    <!-- Header Navigasi Atas -->
+    <div class="navbar-custom d-flex flex-wrap align-items-center justify-content-between shadow-sm">
+      <div class="d-flex align-items-center mb-2 mb-md-0">
+        <div class="bg-white p-1 rounded me-2 text-center" style="width: 40px; height: 40px;">
+          <i class="fa-solid fa-graduation-cap text-primary fs-5"></i>
+        </div>
+        <div>
+          <div class="brand-title">Aneka Tunjangan Guru Aceh</div>
+          <div class="brand-sub">DINAS PENDIDIKAN ACEH</div>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-secondary btn-sm"><i class="fa-solid fa-house"></i> Dashboard Utama</button>
+        <button class="btn btn-info btn-sm text-white"><i class="fa-solid fa-chart-line"></i> Realisasi Per Bulan</button>
+        <button class="btn btn-success btn-sm"><i class="fa-solid fa-folder-open"></i> Lihat Per Gelombang</button>
+        <button class="btn btn-warning btn-sm fw-bold"><i class="fa-solid fa-plus"></i> Unggah File Baru</button>
+        <button class="btn btn-purple btn-sm text-white" style="background-color: #7c3aed;"><i class="fa-solid fa-print"></i> Cetak Khusus Laporan</button>
+        <button class="btn btn-danger btn-sm"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+      </div>
+    </div>
+
+    <!-- Kotak Ringkasan Statistik -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 p-3">
+          <div class="text-muted small mb-1">Total Keseluruhan Server</div>
+          <div class="fs-4 fw-bold text-primary mb-2" id="statTotalBaris">0 baris</div>
+          <div class="row text-center border-top pt-2 g-1">
+            <div class="col border-end"><small class="text-muted d-block">SALUR BRUTO</small><span class="fw-bold fs-6">Rp 0</span></div>
+            <div class="col border-end"><small class="text-muted d-block">TOTAL PPH</small><span class="fw-bold fs-6">Rp 0</span></div>
+            <div class="col border-end"><small class="text-muted d-block">POT. JKN</small><span class="fw-bold fs-6">Rp 0</span></div>
+            <div class="col"><small class="text-muted d-block">SALUR NETTO</small><span class="fw-bold fs-6">Rp 0</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 p-3 border-start border-success border-4">
+          <div class="text-muted small mb-1">Data Ditampilkan (Berdasarkan Filter)</div>
+          <div class="fs-4 fw-bold text-success mb-2" id="statFilterBaris">0 baris</div>
+          <div class="row text-center border-top pt-2 g-1">
+            <div class="col border-end"><small class="text-muted d-block">SALUR BRUTO</small><span class="fw-bold fs-6">Rp 0</span></div>
+            <div class="col border-end"><small class="text-muted d-block">TOTAL PPH</small><span class="fw-bold fs-6">Rp 0</span></div>
+            <div class="col border-end"><small class="text-muted d-block">POT. JKN</small><span class="fw-bold fs-6">Rp 0</span></div>
+            <div class="col"><small class="text-muted d-block">SALUR NETTO</small><span class="fw-bold fs-6">Rp 0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulir Unggah Arsip Berkas Excel Baru -->
+    <div class="card shadow-sm border-0 p-4 mb-4">
+      <h4 class="mb-2">Unggah & Arsipkan Berkas Excel Baru</h4>
+      <p class="text-muted small">Pilih Periode Bulan, Gelombang, Golongan Jenis, dan Jenis Data untuk menyimpan data ke server.</p>
       
       <form id="formUpload">
-        <div class="row mb-3">
+        <div class="row g-3 mb-3">
           <div class="col-md-3">
-            <label class="form-label">Pilih Bulan:</label>
-            <select class="form-select" id="pilihBulan">
+            <label class="form-label small fw-bold">Pilih Bulan:</label>
+            <select class="form-select form-select-sm" id="pilihBulan" required>
               <option value="">-- Pilih Bulan --</option>
               <option value="Januari">Januari</option>
               <option value="Februari">Februari</option>
@@ -38,29 +101,26 @@
               <option value="Desember">Desember</option>
             </select>
           </div>
-
           <div class="col-md-3">
-            <label class="form-label">Pilih Gelombang:</label>
-            <select class="form-select" id="pilihGelombang">
+            <label class="form-label small fw-bold">Pilih Gelombang:</label>
+            <select class="form-select form-select-sm" id="pilihGelombang" required>
               <option value="">-- Pilih Gelombang --</option>
               <option value="Gelombang 1">Gelombang 1</option>
               <option value="Gelombang 2">Gelombang 2</option>
               <option value="Gelombang 3">Gelombang 3</option>
             </select>
           </div>
-
           <div class="col-md-3">
-            <label class="form-label">Golongan Jenis:</label>
-            <select class="form-select" id="pilihGolongan">
+            <label class="form-label small fw-bold">Golongan Jenis:</label>
+            <select class="form-select form-select-sm" id="pilihGolongan" required>
               <option value="">-- Pilih Golongan Jenis --</option>
               <option value="SMA, SMK, SLB, Pengawas">SMA, SMK, SLB, Pengawas</option>
               <option value="SD, SMP">SD, SMP</option>
             </select>
           </div>
-
           <div class="col-md-3">
-            <label class="form-label">Jenis Data Upload:</label>
-            <select class="form-select" id="jenisData">
+            <label class="form-label small fw-bold">Jenis Data Upload:</label>
+            <select class="form-select form-select-sm" id="jenisData" required>
               <option value="">-- Pilih Jenis Data --</option>
               <option value="Tunjangan Profesi Guru">Tunjangan Profesi Guru</option>
               <option value="Tambahan Penghasilan">Tambahan Penghasilan</option>
@@ -70,21 +130,52 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label">File Excel (.xlsx / .xls):</label>
-          <input type="file" class="form-control" id="fileExcel" accept=".xlsx, .xls">
+          <label class="form-label small fw-bold">File Excel (.xlsx / .xls):</label>
+          <input type="file" class="form-control form-control-sm" id="fileExcel" accept=".xlsx, .xls" required>
         </div>
 
-        <button type="submit" class="btn btn-primary" id="btnSimpan">Unggah & Simpan ke Arsip</button>
+        <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold" id="btnSimpan">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Unggah & Simpan ke Arsip
+        </button>
       </form>
+    </div>
+
+    <!-- Tabel Rincian Data Arsip -->
+    <div class="card shadow-sm border-0 p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0 fw-bold">Rincian Seluruh Data Arsip Keuangan</h5>
+        <div>
+          <button class="btn btn-warning btn-sm text-dark fw-bold">Hapus yang Ditandai (Mark)</button>
+          <button class="btn btn-danger btn-sm fw-bold">Hapus Semua Terfilter (Mark All)</button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle small">
+          <thead class="table-dark text-center">
+            <tr>
+              <th>No</th>
+              <th>Bulan</th>
+              <th>Gelombang</th>
+              <th>Golongan</th>
+              <th>Jenis Data</th>
+              <th>Waktu Unggah</th>
+            </tr>
+          </thead>
+          <tbody id="tabelArsip">
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">Tidak ada data ditemukan untuk filter/pencarian ini.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- Skrip Integrasi Firebase & Logika Pembaca Excel -->
+  <!-- Skrip JavaScript & Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Konfigurasi Firebase Anda
     const firebaseConfig = {
       apiKey: "AIzaSyDiauoeWbolZvc6oH_BGZDT6QwvVG5tcPo",
       authDomain: "tunjangan-guru-aceh.firebaseapp.com",
@@ -96,15 +187,14 @@
       measurementId: "G-ZJQM52PZD9"
     };
 
-    // Inisialisasi Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const inputfile = document.getElementById('fileExcel');
+    const inputFile = document.getElementById('fileExcel');
     const btnSimpan = document.getElementById('btnSimpan');
     let dataExcelParsed = null;
 
-    // Fungsi pembersih karakter titik (.) atau simbol khusus agar aman di Firebase Key
+    // Fungsi pembersih karakter khusus agar aman untuk Firebase Key
     function bersihkanKeyFirebase(obj) {
       if (Array.isArray(obj)) {
         return obj.map(item => bersihkanKeyFirebase(item));
@@ -118,8 +208,8 @@
       return obj;
     }
 
-    // Event saat file Excel dipilih
-    inputfile.addEventListener("change", function(e) {
+    // Membaca file Excel dengan benar tanpa error JSON
+    inputFile.addEventListener("change", function(e) {
       const file = e.target.files[0];
       if (!file) return;
 
@@ -128,26 +218,20 @@
         try {
           const data = new Uint8Array(event.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
-
-          // Ambil lembar kerja (sheet) pertama
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-
-          // Konversi isi Excel ke format JSON
           const rawJson = XLSX.utils.sheet_to_json(worksheet);
           
-          // Bersihkan kuncinya
           dataExcelParsed = bersihkanKeyFirebase(rawJson);
-          
-          alert("Berhasil membaca file Excel! Ditemukan " + dataExcelParsed.length + " baris data.");
+          alert("File Excel berhasil dibaca! Ditemukan " + dataExcelParsed.length + " baris data.");
         } catch (error) {
-          alert("Gagal memproses file Excel: " + error.message);
+          alert("Gagal membaca file Excel: " + error.message);
         }
       };
       reader.readAsArrayBuffer(file);
     });
 
-    // Event saat tombol simpan diklik
+    // Proses Simpan ke Firebase
     document.getElementById('formUpload').addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -156,23 +240,17 @@
       const golongan = document.getElementById('pilihGolongan').value;
       const jenisData = document.getElementById('jenisData').value;
 
-      if (!bulan || !gelombang || !golongan || !jenisData) {
-        alert("Mohon lengkapi semua pilihan formulir di atas!");
-        return;
-      }
-
       if (!dataExcelParsed || dataExcelParsed.length === 0) {
-        alert("Silakan pilih file Excel terlebih dahulu dan tunggu hingga terbaca!");
+        alert("Silakan pilih file Excel terlebih dahulu dan tunggu hingga sukses terbaca!");
         return;
       }
 
       btnSimpan.disabled = true;
-      btnSimpan.innerText = "Menyimpan ke Database...";
+      btnSimpan.innerText = "Menyimpan ke Server...";
 
       const arsipRef = ref(db, 'arsip_tunjangan_guru');
-
-      // Mengirim data baris per baris ke Firebase
       let selesai = 0;
+
       dataExcelParsed.forEach((row) => {
         const dataBaruRef = push(arsipRef);
         set(dataBaruRef, {
@@ -192,11 +270,41 @@
             dataExcelParsed = null;
           }
         }).catch((err) => {
-          console.error("Gagal menyimpan:", err);
+          console.error("Gagal:", err);
           btnSimpan.disabled = false;
           btnSimpan.innerText = "Unggah & Simpan ke Arsip";
         });
       });
+    });
+
+    // Menampilkan data real-time di tabel
+    const arsipRef = ref(db, 'arsip_tunjangan_guru');
+    onValue(arsipRef, (snapshot) => {
+      const data = snapshot.val();
+      const tbody = document.getElementById('tabelArsip');
+      const statTotal = document.getElementById('statTotalBaris');
+      
+      if (data) {
+        const arrayData = Object.values(data);
+        statTotal.innerText = arrayData.length + " baris";
+        tbody.innerHTML = "";
+        
+        arrayData.slice(-10).reverse().forEach((item, index) => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="text-center">${index + 1}</td>
+              <td>${item.periodeBulan || '-'}</td>
+              <td>${item.gelombang || '-'}</td>
+              <td>${item.golonganJenis || '-'}</td>
+              <td>${item.jenisDataUpload || '-'}</td>
+              <td class="text-center">${item.waktuUpload || '-'}</td>
+            </tr>
+          `;
+        });
+      } else {
+        statTotal.innerText = "0 baris";
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada data ditemukan untuk filter/pencarian ini.</td></tr>`;
+      }
     });
   </script>
 </body>
