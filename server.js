@@ -130,7 +130,7 @@ app.post('/api/delete', (req, res) => {
     }
 });
 
-// Jalankan Server
+// Tambahkan di bagian paling bawah server.js:
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
